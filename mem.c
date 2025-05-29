@@ -1,6 +1,7 @@
 //#include <unistd.h> /* for sbrk */
+#include <stddef.h>
 #include "mem.h"
-#define _NALLOC	1024
+#define NALLOC	1024
 
 typedef long long Align; /* most restrictive type except for SSE vector which I
 			 * am not worried about */
@@ -17,6 +18,8 @@ union header		/* block header: */
 
 typedef union header Header;
 
+static Header *morecore(unsigned);
+
 static Header base; /* empty list of get started */
 static Header *freep = NULL; /* start of free list */
 
@@ -24,7 +27,7 @@ static Header *freep = NULL; /* start of free list */
 void *malloc(unsigned nbytes)
 {
 	Header *p, *prevp;
-	Header *morecore(unsigned);
+	//static Header *morecore(unsigned);
 	unsigned nunits;
 
 	nunits = (nbytes + sizeof(Header) - 1) / sizeof(Header) + 1;
@@ -35,7 +38,7 @@ void *malloc(unsigned nbytes)
 	}
 	for(p = prevp->s.ptr; ; prevp = p, p = p->s.ptr)
 	{
-		if(p->s.size >= nunit) /* big enough */
+		if(p->s.size >= nunits) /* big enough */
 		{
 			if(p->s.size == nunits) /* exactly */
 				prevp->s.ptr = p->s.ptr;
@@ -57,13 +60,13 @@ void *malloc(unsigned nbytes)
 /* morecore: ask system for more memory */
 static Header *morecore(unsigned nu)
 {
-	void *cp, sbrk(int) /* this is in <unistd.h>, could use that instead */
+	void *cp, *sbrk(int); /* this is in <unistd.h>, could use that instead */
 	Header *up;
 
 	if(nu < NALLOC)
 		nu = NALLOC;
 	cp = sbrk(nu * sizeof(Header));
-	if(cp == (char *) - 1) /* no space at all */
+	if(cp == (void *) - 1) /* no space at all */
 		return NULL;
 	up = (Header *) cp;
 	up->s.size = nu;
@@ -89,7 +92,7 @@ void free(void *ap)
 	}
 	else
 		bp->s.ptr = p->s.ptr;
-	if(p + p->s.ptr = p->s.ptr) /* join to lower nbr */
+	if(p + p->s.size == p->s.ptr) /* join to lower nbr */
 	{
 		p->s.size += bp->s.size;
 		p->s.ptr = bp->s.ptr;
