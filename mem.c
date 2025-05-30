@@ -1,5 +1,6 @@
 //#include <unistd.h> /* for sbrk */
 #include <stddef.h>
+#include <errno.h>
 #include "mem.h"
 #define NALLOC	1024
 #define MAXREQ	1048576 /* 1 MiB max request for malloc */
@@ -28,8 +29,11 @@ static Header *freep = NULL; /* start of free list */
 void *malloc(unsigned nbytes)
 {
 	/* error checking, we are only allowing max 1 Mebibyte */
-	if(nbytes > MAXREQ)
+	if(nbytes > MAXREQ || nbytes <= 0)
+	{
+		errno = EINVAL;
 		return NULL;
+	}
 
 	Header *p, *prevp;
 	//static Header *morecore(unsigned);
@@ -58,7 +62,10 @@ void *malloc(unsigned nbytes)
 		}
 		if(p == freep) /* wrapped around free list */
 			if((p = morecore(nunits)) == NULL)
+			{
+				errno = ENOMEM; /* stdlib error no memory */
 				return NULL; /* none left */
+			}
 	}
 }
 
@@ -90,6 +97,14 @@ void free(void *ap)
 	Header *bp, *p;
 
 	bp = (Header *)ap - 1; /* points to block header */
+
+	/* error checking for valid size */
+	if(bp->s.size <= 0)
+	{
+		errno = EINVAL; /* XXX: Is this the right one? Not sure */
+		return;
+	}
+
 	for(p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
 	{
 		if(p >= p->s.ptr && (bp > p || bp < p->s.ptr))
