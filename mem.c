@@ -144,5 +144,5 @@ void bfree(void *ap, unsigned nchar)
 	nunits = (nchar + sizeof(Header) - 1) / sizeof(Header) + 1; /* size */
 
 	bp->s.size = nunits;
-	free((void *)(ap + 1));
+	free((void *)(bp + 1));
 }
