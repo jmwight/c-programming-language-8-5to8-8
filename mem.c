@@ -57,6 +57,11 @@ void *malloc(unsigned nbytes)
 	}
 }
 
+void *calloc(unsigned n, unsigned nbytes)
+{
+	return malloc(n * nbytes);
+}
+
 /* morecore: ask system for more memory */
 static Header *morecore(unsigned nu)
 {
