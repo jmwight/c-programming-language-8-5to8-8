@@ -109,6 +109,12 @@ void free(void *ap)
 	{
 		if(p >= p->s.ptr && (bp > p || bp < p->s.ptr))
 			break; /* freed block at start or end of arena */
+		/* memory has already been freed */
+		else if(bp == p)
+		{
+			errno = EINVAL;
+			return;
+		}
 	}
 	if(bp + bp->s.size == p->s.ptr) /* join to upper nbr */
 	{
