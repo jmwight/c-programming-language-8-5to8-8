@@ -53,7 +53,7 @@ void *malloc(unsigned nbytes)
 		}
 		if(p == freep) /* wrapped around free list */
 			if((p = morecore(nunits)) == NULL)
-				return NULL;
+				return NULL; /* none left */
 	}
 }
 
@@ -92,7 +92,7 @@ void free(void *ap)
 	}
 	else
 		bp->s.ptr = p->s.ptr;
-	if(p + p->s.size == p->s.ptr) /* join to lower nbr */
+	if(p + p->s.size == bp) /* join to lower nbr */
 	{
 		p->s.size += bp->s.size;
 		p->s.ptr = bp->s.ptr;
