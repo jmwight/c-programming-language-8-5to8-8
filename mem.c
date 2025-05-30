@@ -129,9 +129,14 @@ void free(void *ap)
 
 /* bfree: frees memory in a static or extern array (not obtained from malloc)
  * and adds to free list */
-void bfree(void *ap, unsigned n)
+void bfree(void *ap, unsigned nchar)
 {
-	Header *bp = (Header *)ap;
-	bp->s.size = n;
+	Header *bp;
+	unsigned nunits;
+
+	bp = (Header *)ap; /* cast into proper type */
+	nunits = (nchar + sizeof(Header) - 1) / sizeof(Header) + 1; /* size */
+
+	bp->s.size = nunits;
 	free((void *)(ap + 1));
 }

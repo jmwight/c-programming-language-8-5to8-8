@@ -9,5 +9,9 @@ int main(void)
 	printf("Int is %d\n", *x);
 	printf("Errno is %d\n", errno);
 	free(x);
+
+	static char y[20];
+	bfree(y, 20);
+
 	return errno;
 }
