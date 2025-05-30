@@ -125,3 +125,11 @@ void free(void *ap)
 		p->s.ptr = bp;
 	freep = p;
 }
+
+/* bfree: frees memory in a static or extern array (not obtained from malloc)
+ * and adds to free list */
+void bfree(void *ap, unsigned n)
+{
+	ap->s.size = n;
+	free((void *)(ap + 1));
+}
