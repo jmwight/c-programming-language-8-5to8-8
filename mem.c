@@ -131,6 +131,7 @@ void free(void *ap)
  * and adds to free list */
 void bfree(void *ap, unsigned n)
 {
-	ap->s.size = n;
+	Header *bp = (Header *)ap;
+	bp->s.size = n;
 	free((void *)(ap + 1));
 }
