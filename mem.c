@@ -3,7 +3,6 @@
 #include <errno.h>
 #include "mem.h"
 #define NALLOC	1024
-#define MAXREQ	1048576 /* 1 MiB max request for malloc */
 
 typedef long long Align; /* most restrictive type except for SSE vector which I
 			 * am not worried about */
@@ -29,7 +28,7 @@ static Header *freep = NULL; /* start of free list */
 void *malloc(unsigned nbytes)
 {
 	/* error checking, we are only allowing max 1 Mebibyte */
-	if(nbytes > MAXREQ || nbytes <= 0)
+	if(nbytes <= 0)
 	{
 		errno = EINVAL;
 		return NULL;
