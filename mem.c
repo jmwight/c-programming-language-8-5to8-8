@@ -68,6 +68,7 @@ void *malloc(unsigned nbytes)
 	}
 }
 
+/* calloc: returns pointer to an array of n elements of nbytes each element */
 void *calloc(unsigned n, unsigned nbytes)
 {
 	return malloc(n * nbytes);
