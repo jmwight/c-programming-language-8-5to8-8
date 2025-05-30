@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include "mem.h"
 #define NALLOC	1024
+#define MAXREQ	1048576 /* 1 MiB max request for malloc */
 
 typedef long long Align; /* most restrictive type except for SSE vector which I
 			 * am not worried about */
@@ -26,6 +27,10 @@ static Header *freep = NULL; /* start of free list */
 /* malloc: general-purpose storage allocator */
 void *malloc(unsigned nbytes)
 {
+	/* error checking, we are only allowing max 1 Mebibyte */
+	if(nbytes > MAXREQ)
+		return NULL;
+
 	Header *p, *prevp;
 	//static Header *morecore(unsigned);
 	unsigned nunits;
